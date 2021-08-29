@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plus_router/plus_router_state.dart';
-import 'route_information_parser.dart';
-import 'router_delegate.dart';
-import 'plus_route.dart';
+import '../lib/plus_router_state.dart';
+import '../lib/route_information_parser.dart';
+import '../lib/router_delegate.dart';
+import '../lib/plus_route.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,10 +11,6 @@ void main() {
 class MyApp extends StatelessWidget {
   
   final List<PlusRoute> routes = [
-    PlusRoute(
-      path: "home",
-      builder: (state, args) => HomePage(routerState: state)
-    ),
     PlusRoute(
       path: "home",
       builder: (state, args) => HomePage(routerState: state)
