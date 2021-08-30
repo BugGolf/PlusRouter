@@ -4,8 +4,10 @@ import 'package:plus_router/plus_can_activate.dart';
 import 'plus_router_error.dart';
 
 class PlusRouterState extends ChangeNotifier {
-  PlusRouter router;
-  PlusRouterState(this.router);
+  PlusRouter router = PlusRouter([]);
+
+  static PlusRouterState _routerState = PlusRouterState();
+  static PlusRouterState get instance => _routerState;
 
   Map<String, dynamic> _stateObject = {};
 
@@ -40,7 +42,6 @@ class PlusRouterState extends ChangeNotifier {
   
   /// Navigate
   void navigate(List<String> urlSegments) {
-    debugPrint(urlSegments.toString());
     this.router.tryParse(urlSegments);
     this.canActivate().then((value) {
       notifyListeners();
@@ -239,7 +240,8 @@ with ChangeNotifier, PopNavigatorRouterDelegateMixin<PlusRouter> {
   late PlusRouterState state;
 
   PlusRouterDelegate(List<PlusRoute> routes) {
-    this.state = PlusRouterState(PlusRouter(routes));
+    this.state = PlusRouterState.instance;
+    this.state.router = PlusRouter(routes);
     this.state.addListener(notifyListeners);
   }
 
