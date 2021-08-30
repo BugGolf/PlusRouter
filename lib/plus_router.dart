@@ -42,6 +42,7 @@ class PlusRouterState extends ChangeNotifier {
   void navigate(List<String> urlSegments) {
     this.router.tryParse(urlSegments);
     this.canActivate().then((value) {
+      // debugPrint(this.router.location);
       notifyListeners();
     });
   }
@@ -152,17 +153,30 @@ class PlusRoute {
       String urlSegment = urlSegments[i].toString();
       String pathSegment = pathSegments[i].toString();
 
-      if (urlSegment == pathSegment) this.localSegments.add(pathSegment);
-
-      // Check segment start with ':' is argument
-      // Ex. /home/:id
-      if (checkArgument(pathSegment)) {
-        this.setArgument(pathSegment, urlSegment);
-        this.localSegments.add(urlSegment);
+      if (localSegments.length == i) {
+        if (urlSegment == pathSegment) {
+          this.localSegments.add(pathSegment);
+        } else {
+          // Check segment start with ':' is argument
+          // Ex. /home/:id
+          if (checkArgument(pathSegment)) {
+            this.setArgument(pathSegment, urlSegment);
+            this.localSegments.add(urlSegment);
+          }
+        }
       }
     }
 
     if (this.localSegments.isNotEmpty) {
+      // print("URL Segment:");
+      // print(urlSegments);
+
+      // print("Path Segment:");
+      // print(pathSegments);
+
+      // print("Local Segment:");
+      // print(localSegments);
+
       this.isActive = localSegments.length == urlSegments.length;
       this.isParent = localSegments.length < urlSegments.length;
       return true;
@@ -190,7 +204,6 @@ class PlusRouter {
       bool result = route.parseURLSegment(urlSegments);
       if (result) {
         this.activatedRoutes.add(route);
-
         if (route.isActive) this.currentRoute = route;
       }
     }

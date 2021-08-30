@@ -98,7 +98,11 @@ void main() {
   group('Test Navigation', () {
     List<PlusRoute> routes = [
       PlusRoute(path: "/home", widget: Container()),
-      PlusRoute(path: "/home/detail", widget: Container())
+      PlusRoute(path: "/home/detail", widget: Container()),
+      PlusRoute(path: "/book", widget: Container()),
+      PlusRoute(path: "/book/:id", widget: Container()),
+      PlusRoute(path: "/hospital", widget: Container()),
+      PlusRoute(path: "/hospital/:id", widget: Container()),
     ];
     PlusRouterState router = PlusRouterState();
     router.router = PlusRouter(routes);
@@ -109,19 +113,16 @@ void main() {
       router.navigate(uri.pathSegments);
       expect(router.location, "/home");
     });
-
     test("navigate to home detail", () async {
       Uri uri = Uri.parse("/home/detail");
       
       router.navigate(uri.pathSegments);
       expect(router.location, "/home/detail");
     });
-
     test("navigate to home detail by string", () async {
       router.navigateByUrl("/home/detail");
       expect(router.location, "/home/detail");
     });
-
     test("navigate can back to home", () async {
       Uri uri = Uri.parse("/home/detail");
       router.navigate(uri.pathSegments);
@@ -129,7 +130,6 @@ void main() {
       expect(router.location, "/home/detail");
       expect(router.canBack(), true);
     });
-
     test("navigate back to home", () async {
       Uri uri = Uri.parse("/home/detail");
       router.navigate(uri.pathSegments);
@@ -139,6 +139,25 @@ void main() {
 
       router.back();
       expect(router.location, "/home");
+    });
+    test("navigate to book home", () async {
+      Uri uri = Uri.parse("/book");
+      router.navigate(uri.pathSegments);
+
+      expect(router.location, "/book");
+    });
+    test("navigate to book detail", () async {
+      Uri uri = Uri.parse("/book/1");
+      router.navigate(uri.pathSegments);
+
+      expect(router.location, "/book/1");
+    });
+    test("navigate to hospital detail", () async {
+      Uri uri = Uri.parse("/hospital/1");
+      router.navigate(uri.pathSegments);
+
+      print(router.router.currentRoute?.name);
+      expect(router.location, "/hospital/1");
     });
 
   });
