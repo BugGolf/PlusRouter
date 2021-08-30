@@ -100,7 +100,8 @@ void main() {
       PlusRoute(path: "/home", widget: Container()),
       PlusRoute(path: "/home/detail", widget: Container())
     ];
-    PlusRouterState router = PlusRouterState(PlusRouter(routes));
+    PlusRouterState router = PlusRouterState();
+    router.router = PlusRouter(routes);
 
     test("navigate to home", () async {
       Uri uri = Uri.parse("/home");

@@ -10,7 +10,7 @@ class AuthGuard implements PlusRouterCanActivate {
   @override
   Future<bool> canActivate(PlusRouterState state) async {
     bool? login = state.getStateObject("login") as bool?;
-    debugPrint(login.toString());
+    
     if(login == true) {
       return false;
     } else {
