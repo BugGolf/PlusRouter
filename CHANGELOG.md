@@ -1,3 +1,6 @@
+## 1.0.0-dev.4
+- Update README.md
+
 ## 1.0.0-dev.3
 - Add navigate back()
 - Add navigate canBack()
