@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
-import '../lib/plus_router_state.dart';
-import '../lib/route_information_parser.dart';
-import '../lib/router_delegate.dart';
-import '../lib/plus_route.dart';
+import 'package:plus_router/plus_router.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  
-  final List<PlusRoute> routes = [
-    PlusRoute(
-      path: "home",
-      builder: (state, args) => HomePage(routerState: state)
-    ),
-    PlusRoute(
-      path: "welcome",
-      builder: (state, args) => WelcomePage(routerState: state)
-    ),
-    PlusRoute(
-      path: "home/detail/:id",
-      builder: (state, args) => HomeDetailPage(routerState: state, args: args)
-    ),
-  ];
+List<PlusRoute> routes = [
+  PlusRoute(
+    path: "/",
+    builder: (state, args) => HomePage(routerState: state)
+  ),
+  PlusRoute(
+    path: "/home/list",
+    builder: (state, args) => WelcomePage(routerState: state)
+  ),
+  PlusRoute(
+    path: "/home/list/:id",
+    builder: (state, args) => HomeDetailPage(routerState: state, args: args)
+  )
+];
 
+class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Flutter Demo',
+      title: 'Demo Route',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -41,7 +37,7 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   final PlusRouterState routerState;
-  const HomePage({ Key? key, required this.routerState }) : super(key: key);
+  HomePage({ Key? key, required this.routerState }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +48,7 @@ class HomePage extends StatelessWidget {
           Container(
             child: ElevatedButton(
               onPressed: () { 
-                this.routerState.navigate(["welcome"]);
+                this.routerState.navigateByUrl("/home/list");
               },
               child: Text("Click"),
             )
@@ -76,7 +72,7 @@ class WelcomePage extends StatelessWidget {
           Container(
             child: ElevatedButton(
               onPressed: () { 
-                this.routerState.navigate(["home", "detail", "100"]);
+                this.routerState.navigateByUrl("/home/list/100");
               },
               child: Text("Click"),
             )
@@ -99,11 +95,11 @@ class HomeDetailPage extends StatelessWidget {
     return Scaffold(
        body: Center(child: Column(
         children: [
-          Container(child: Text("Detail Page ${arg}")),
+          Container(child: Text("Detail Page $arg")),
           Container(
             child: ElevatedButton(
-              onPressed: () { 
-                this.routerState.navigate(["home"]);
+              onPressed: () {
+                this.routerState.back();
               },
               child: Text("Click"),
             )
