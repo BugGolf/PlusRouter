@@ -1,3 +1,6 @@
+## 1.0.0-dev.6
+- Add defaultRoute
+
 ## 1.0.0-dev.5
 - Add @optional new initialRoute to PlusRouteInformationParser
 - Add @optional custom loading page to PlusRouterDelegate
