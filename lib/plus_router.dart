@@ -278,6 +278,7 @@ class PlusRouterDelegate extends RouterDelegate<PlusRouter>
 
   @override
   Future<void> setNewRoutePath(router) async {
+    this.state.setLoadPage();
     await this.canActivate();
     await this.state.setNewRouter(router);
   }
