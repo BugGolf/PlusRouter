@@ -105,7 +105,7 @@ void main() {
       PlusRoute(path: "/hospital/:id", widget: Container()),
     ];
     PlusRouterState router = PlusRouterState();
-    router.router = PlusRouter(routes);
+    router.setNewRouter(PlusRouter(routes));
 
     test("navigate to home", () async {
       Uri uri = Uri.parse("/home");
@@ -156,7 +156,6 @@ void main() {
       Uri uri = Uri.parse("/hospital/1");
       router.navigate(uri.pathSegments);
 
-      print(router.router.currentRoute?.name);
       expect(router.location, "/hospital/1");
     });
 

@@ -5,6 +5,6 @@ class PlusRouterLoadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Scaffold(body: Center(child: Text("PlusRouter: Loading ...")));
   }
 }
