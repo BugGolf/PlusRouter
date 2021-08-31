@@ -25,7 +25,7 @@ class PlusRouterState extends ChangeNotifier {
     return isErrorPage ? "/" : router.location;
   }
 
-  Future<void> setNewRouter(PlusRouter router) async {
+  void setNewRouter(PlusRouter router) {
     this.router = router;
     this._isLoadPage = false;
     notifyListeners();
@@ -267,19 +267,25 @@ class PlusRouterDelegate extends RouterDelegate<PlusRouter>
       ]);
   }
 
-  Future<void> canActivate() async {
-    PlusRoute? current = this.state.router.currentRoute;
+  Future<bool> canActivate(PlusRouter _router) async {
+    PlusRoute? current = _router.currentRoute;
     List<PlusRouterCanActivate>? canActivates = current?.canActivate;
 
     if (current != null && canActivates != null)
-      for (PlusRouterCanActivate activate in current.canActivate!)
-        if (await activate.canActivate(this.state) == false) return;
+      for (PlusRouterCanActivate activate in current.canActivate!) {
+        if (await activate.canActivate(this.state) == false) return false;
+      }
+
+    return true;
   }
 
   @override
   Future<void> setNewRoutePath(router) async {
+    this.state.setNewRouter(router);
     this.state.setLoadPage();
-    await this.canActivate();
-    await this.state.setNewRouter(router);
+
+    await this.canActivate(router).then((value) async {
+      if(value) this.state.setNewRouter(router);
+    });
   }
 }
