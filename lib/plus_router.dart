@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plus_router/plus_can_activate.dart';
+import 'package:plus_router/plus_router_load.dart';
 import 'plus_router_error.dart';
 
 class PlusRouterState extends ChangeNotifier {
@@ -10,6 +11,11 @@ class PlusRouterState extends ChangeNotifier {
   static PlusRouterState get instance => _routerState;
 
   Map<String, dynamic> _stateObject = {};
+  bool _isLoadPage = false;
+  
+  bool get isLoadPage {
+    return this._isLoadPage;
+  }
 
   bool get isErrorPage {
     return router.currentRoute == null;
@@ -21,30 +27,19 @@ class PlusRouterState extends ChangeNotifier {
 
   Future<void> setNewRouter(PlusRouter router) async {
     this.router = router;
-    await this.canActivate();
-
+    this._isLoadPage = false;
     notifyListeners();
   }
 
-  Future<void> canActivate() async {
-    if (this.router.currentRoute != null) {
-      if (this.router.currentRoute!.canActivate != null) {
-        for (PlusRouterCanActivate activate
-            in this.router.currentRoute!.canActivate!) {
-          bool result = await activate.canActivate(this);
-          if (!result) return;
-        }
-      }
-    }
+  void setLoadPage() {
+    this._isLoadPage = true;
+    notifyListeners();
   }
 
   /// Navigate
   void navigate(List<String> urlSegments) {
     this.router.tryParse(urlSegments);
-    this.canActivate().then((value) {
-      // debugPrint(this.router.location);
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   /// Navigate by url string
@@ -83,8 +78,6 @@ class PlusRouterState extends ChangeNotifier {
 
   dynamic getStateObject(String key) {
     if (this._stateObject.containsKey(key)) return this._stateObject[key];
-
-    notifyListeners();
   }
 }
 
@@ -114,13 +107,12 @@ class PlusRoute {
     return localSegments.join("_") + "_route";
   }
 
-  PlusRoute(
-      {required this.path,
-      this.builder,
-      this.widget,
-      this.canActivate,
-      this.routerMatch = RouterMatch.Prefix})
-      : assert((builder == null) != (widget == null));
+  PlusRoute({required this.path,
+    this.builder,
+    this.widget,
+    this.canActivate,
+    this.routerMatch = RouterMatch.Prefix})
+    : assert((builder == null) != (widget == null));
 
   /// Start with ':' is argument
   bool checkArgument(String value) {
@@ -168,15 +160,6 @@ class PlusRoute {
     }
 
     if (this.localSegments.isNotEmpty) {
-      // print("URL Segment:");
-      // print(urlSegments);
-
-      // print("Path Segment:");
-      // print(pathSegments);
-
-      // print("Local Segment:");
-      // print(localSegments);
-
       this.isActive = localSegments.length == urlSegments.length;
       this.isParent = localSegments.length < urlSegments.length;
       return true;
@@ -236,9 +219,14 @@ class PlusRouterDelegate extends RouterDelegate<PlusRouter>
   @override
   GlobalKey<NavigatorState>? get navigatorKey => GlobalKey<NavigatorState>();
 
+  final Widget? loadPage;
+  final Widget? errorPage;
   late PlusRouterState state;
 
-  PlusRouterDelegate(List<PlusRoute> routes) {
+  PlusRouterDelegate(List<PlusRoute> routes, {  
+    this.errorPage,
+    this.loadPage
+  }) {
     this.state = PlusRouterState.instance;
     this.state.router = PlusRouter(routes);
     this.state.addListener(notifyListeners);
@@ -258,24 +246,39 @@ class PlusRouterDelegate extends RouterDelegate<PlusRouter>
   @override
   Widget build(BuildContext context) {
     return Navigator(
-        key: navigatorKey,
-        onPopPage: (route, result) {
-          if (!route.didPop(result)) return false;
-          return this.state.back();
-        },
-        pages: [
-          for (PlusRoute route in state.router.activatedRoutes)
-            MaterialPage(
-                key: ValueKey(route.name),
-                child: route.widget ?? route.builder!(state, route.arguments)),
-          if (state.isErrorPage)
-            MaterialPage(
-                key: ValueKey("plus_error_page"), child: PlusRouterErrorPage())
-        ]);
+      key: navigatorKey,
+      onPopPage: (route, result) {
+        if (!route.didPop(result)) return false;
+        return this.state.back();
+      },
+      pages: [
+        for (PlusRoute route in state.router.activatedRoutes)
+          MaterialPage(
+            key: ValueKey(route.name),
+            child: route.widget ?? route.builder!(state, route.arguments)),
+        if (state.isLoadPage)
+          MaterialPage(
+            key: ValueKey("plus_router_load_page"), 
+            child: loadPage ?? PlusRouterLoadPage()),
+        if (state.isErrorPage)
+          MaterialPage(
+            key: ValueKey("plus_router_error_page"), 
+            child: errorPage ?? PlusRouterErrorPage())
+      ]);
+  }
+
+  Future<void> canActivate() async {
+    PlusRoute? current = this.state.router.currentRoute;
+    List<PlusRouterCanActivate>? canActivates = current?.canActivate;
+
+    if (current != null && canActivates != null)
+      for (PlusRouterCanActivate activate in current.canActivate!)
+        if (await activate.canActivate(this.state) == false) return;
   }
 
   @override
   Future<void> setNewRoutePath(router) async {
-    await state.setNewRouter(router);
+    await this.canActivate();
+    await this.state.setNewRouter(router);
   }
 }
