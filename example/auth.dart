@@ -11,7 +11,9 @@ class AuthGuard implements PlusRouterCanActivate {
   @override
   Future<bool> canActivate(PlusRouterState state) async {
     bool? login = state.getStateObject("login") as bool?;
-    await Future.delayed(Duration(milliseconds: 1500));
+
+    /// Faker http request to authenticate system
+    await Future.delayed(Duration(seconds: 2));
 
     if(login == true) {
       return false;
@@ -53,6 +55,8 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginPage extends StatelessWidget {
+
+  /// final PlusRouterState routerState = PlusRouterState.instance;
   final PlusRouterState routerState;
   const LoginPage({ Key? key, required this.routerState }) : super(key: key);
 

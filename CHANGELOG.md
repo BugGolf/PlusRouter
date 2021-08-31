@@ -1,3 +1,8 @@
+## 1.0.0-dev.5
+- Add @optional new initialRoute to PlusRouteInformationParser
+- Add @optional custom loading page to PlusRouterDelegate
+- Fix error when reload page
+
 ## 1.0.0-dev.4
 - Update README.md
 

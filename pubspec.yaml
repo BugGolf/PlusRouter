@@ -1,6 +1,6 @@
 name: plus_router
 description: Easy Router for web application. This package using Navigator 2.0 system for routing easy in web application
-version: 1.0.0-dev.4
+version: 1.0.0-dev.5
 repository: https://github.com/BugGolf/PlusRouter
 environment:
   sdk: ">=2.12.0 <3.0.0"
