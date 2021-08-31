@@ -81,12 +81,10 @@ class PlusRoute {
   bool isParent = false;
   bool isActive = false;
 
-  List<String> get pathSegments => Uri.parse(this.path).pathSegments;
+  String get name => localSegments.join("_") + "_route";
   String get location => "/" + localSegments.join("/");
 
-  String get name {
-    return localSegments.join("_") + "_route";
-  }
+  List<String> get pathSegments => Uri.parse(this.path).pathSegments;
 
   PlusRoute({required this.path,
     this.builder,
@@ -148,16 +146,22 @@ class PlusRoute {
 
     return false;
   }
+
+  updateLocalSegments(List<String> localtionSegments) {
+    this.localSegments = localtionSegments;
+  }
 }
 
 class PlusRouter {
   /// User defined routes
   final List<PlusRoute> routes;
-  PlusRouter(this.routes);
+  final String initialRoute;
+  PlusRouter(this.routes, { this.initialRoute = "/" });
 
   List<String> urlSegments = [];
   List<PlusRoute> activatedRoutes = [];
   PlusRoute? route;
+  PlusRoute? defaultRoute;
 
   PlusRoute? tryParse(List<String> urlSegments) {
     // Reset activatedRoutes
@@ -167,6 +171,14 @@ class PlusRouter {
     // forEach List<PlusRoute> routes
     this.activatedRoutes = [];
     for (PlusRoute route in routes) {
+      // initialRoute
+      if(route.path == this.initialRoute) {
+        this.defaultRoute = route;
+        this.defaultRoute!.updateLocalSegments(
+          Uri.parse(this.initialRoute).pathSegments
+        );
+      }
+
       bool result = route.parseURLSegment(urlSegments);
       if (result) {
         // If route is active == this is current route
@@ -177,8 +189,13 @@ class PlusRouter {
           this.activatedRoutes.add(route);
       }
     }
+
+    if(this.route == null && this.defaultRoute != null)
+      this.route = this.defaultRoute;
+
     return this.route;
   }
+
 }
 
 class PlusRouteInformationParser extends RouteInformationParser<PlusRouter> {
@@ -191,12 +208,9 @@ class PlusRouteInformationParser extends RouteInformationParser<PlusRouter> {
       RouteInformation routeInformation) async {
     Uri uri = Uri.parse(routeInformation.location!);
     
-    PlusRouter router = PlusRouter(this.routes);
+    PlusRouter router = PlusRouter(this.routes, initialRoute: this.initialRoute);
     router.tryParse(uri.pathSegments);
 
-    if(router.route == null)
-      router.tryParse(Uri.parse(this.initialRoute).pathSegments);
-    
     return router;
   }
 
@@ -236,8 +250,21 @@ class PlusRouterDelegate extends RouterDelegate<PlusRouter>
     return Navigator(
       key: navigatorKey,
       onPopPage: (route, result) {
-        if (!route.didPop(result)) return false;
-        return this.state.back();
+        PlusRoute? currentRoute = this.state._router.route;
+        PlusRoute? defaultRoute = this.state._router.defaultRoute;
+        // Don't back when is initialRoute
+        if(currentRoute == defaultRoute) {
+          route.didPop(false);
+          return false;
+        } else {
+          
+          // Check route can back
+          if (!route.didPop(result)) 
+            return false;
+
+          // Back with state back()
+          return this.state.back();
+        }
       },
       pages: [
         MaterialPage(
