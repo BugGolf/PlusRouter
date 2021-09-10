@@ -29,8 +29,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routerDelegate: PlusRouterDelegate(routes),
+
+      // routeInformationParser: PlusRouteInformationParser(newRoutes, 
+      //   initialRoute: "/home" // Custom initialRoute
+      // ),
       routeInformationParser: PlusRouteInformationParser(routes),
+
+      // routerDelegate: PlusRouterDelegate(routes, 
+      //   loadPage: CustomLoadingPage()
+      // )
+      routerDelegate: PlusRouterDelegate(routes)
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plus_router/plus_can_activate.dart';
 import 'package:plus_router/plus_router.dart';
+import 'package:plus_router/plus_router_load.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,7 +11,10 @@ class AuthGuard implements PlusRouterCanActivate {
   @override
   Future<bool> canActivate(PlusRouterState state) async {
     bool? login = state.getStateObject("login") as bool?;
-    
+
+    /// Faker http request to authenticate system
+    await Future.delayed(Duration(seconds: 2));
+
     if(login == true) {
       return false;
     } else {
@@ -41,13 +45,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routerDelegate: PlusRouterDelegate(routes),
       routeInformationParser: PlusRouteInformationParser(routes),
+      // routerDelegate: PlusRouterDelegate(routes),
+      routerDelegate: PlusRouterDelegate(routes,
+        loadPage: PlusRouterLoadPage()
+      ),
     );
   }
 }
 
 class LoginPage extends StatelessWidget {
+
+  /// final PlusRouterState routerState = PlusRouterState.instance;
   final PlusRouterState routerState;
   const LoginPage({ Key? key, required this.routerState }) : super(key: key);
 
