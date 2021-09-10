@@ -214,7 +214,7 @@ class PlusRouteInformationParser extends RouteInformationParser<PlusRouter> {
     router.tryParse(uri.pathSegments);
 
     if(router.route?.isArgs == true)
-      router.route = router.activatedRoutes[0];
+      router.tryParse([uri.pathSegments[0]]);
 
     return router;
   }
