@@ -107,6 +107,7 @@ class PlusRoute {
   List<String> localSegments = [];
 
   bool isParent = false;
+  bool isArgs = false;
   bool isActive = false;
   
   List<String> get pathSegments => Uri.parse(this.path).pathSegments;
@@ -165,6 +166,7 @@ class PlusRoute {
       // Check segment start with ':' is argument
       // Ex. /home/:id
       if(checkArgument(pathSegment)) {
+        this.isArgs = true;
         this.setArgument(pathSegment, urlSegment);
         this.localSegments.add(urlSegment);
       }
@@ -221,6 +223,9 @@ class PlusRouteInformationParser extends RouteInformationParser<PlusRouter> {
 
     PlusRouter router = PlusRouter(this.routes);
     router.tryParse(uri.pathSegments);
+
+    if(router.currentRoute?.isArgs == true)
+      router.tryParse([uri.pathSegments[0]]);
 
     return router;
   }
