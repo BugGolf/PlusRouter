@@ -1,3 +1,6 @@
+## 1.0.0-dev.7
+- Fix error on loading url with parameter
+
 ## 1.0.0-dev.6
 - Add defaultRoute
 
